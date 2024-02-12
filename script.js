@@ -20,8 +20,8 @@ function e() {
 
   const MOVE_SPEED = 0.2 * ZOOM;
   const MAX_SPEED = 10 * ZOOM;
-  const STEER_SPEED = 0.2;
-  const MAX_STEER = 2;
+  const STEER_SPEED = 2;
+  const MAX_STEER = 12;
   const PLAYER_SIZE = 25 * ZOOM;
 
   const PLAYER_CANVAS = CANVAS_WIDTH / 2 - PLAYER_SIZE / 2;
@@ -93,16 +93,25 @@ function e() {
 
   function drawArrow() {
     ctx.beginPath();
+    ctx.strokeStyle = "blue";
     ctx.moveTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     ctx.lineTo(
       CANVAS_WIDTH / 2 + 50 * Math.cos((steering * Math.PI) / 180),
       CANVAS_HEIGHT / 2 + 50 * Math.sin((steering * Math.PI) / 180)
     );
+    ctx.stroke();
+
+    // Start a new path for the black line
+    ctx.beginPath();
+    ctx.strokeStyle = "black";
+    ctx.moveTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+
+    // Make the black line follow the direction of the blue line
+    let blackSteering = steering + steerDirection;
     ctx.lineTo(
-      CANVAS_WIDTH / 2 + 50 * Math.cos(((steering + 180) * Math.PI) / 180),
-      CANVAS_HEIGHT / 2 + 50 * Math.sin(((steering + 180) * Math.PI) / 180)
+      CANVAS_WIDTH / 2 + 20 * Math.cos((blackSteering * Math.PI) / 180),
+      CANVAS_HEIGHT / 2 + 20 * Math.sin((blackSteering * Math.PI) / 180)
     );
-    ctx.closePath();
     ctx.stroke();
   }
 
@@ -116,7 +125,14 @@ function e() {
 
     if (pressedSpace) speed = Math.max(0, speed - MOVE_SPEED);
 
-    steering += steerDirection;
+    const convertedSteer =
+      speed == 0 ? 0 : steerDirection * 0.2 * (speed / MAX_SPEED);
+    steering += convertedSteer;
+    steerDirection =
+      steerDirection > 0
+        ? Math.max(0, steerDirection - Math.abs(convertedSteer))
+        : Math.min(0, steerDirection + Math.abs(convertedSteer));
+
     if (steering > 360) steering -= 360;
     if (steering < 0) steering += 360;
   }
@@ -154,13 +170,13 @@ function e() {
     handleControls();
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    console.log(speed, steering, x, y);
+    console.log(speed, steering, steerDirection, x, y);
 
     //   speedY += 1; // gravity
     if (speed > 0) speed -= speedFriction;
     else if (speed < 0) speed += speedFriction;
-    if (steerDirection > 0) steerDirection -= steerFriction;
-    else if (steerDirection < 0) steerDirection += steerFriction;
+    // if (steerDirection > 0) steerDirection -= steerFriction;
+    // else if (steerDirection < 0) steerDirection += steerFriction;
 
     speed = Math.round(speed * 1000) / 1000;
     steerDirection = Math.round(steerDirection * 1000) / 1000;
