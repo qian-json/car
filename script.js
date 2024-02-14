@@ -20,9 +20,9 @@ function e() {
 
   const MOVE_SPEED = 0.2 * ZOOM;
   const MAX_SPEED = 12 * ZOOM;
-  const STEER_SPEED = 2;
-  const MAX_STEER = 20;
-  const PLAYER_SIZE = 25 * ZOOM;
+  const BASE_STEER_SPEED = 2;
+  const MAX_STEER = 32;
+  const PLAYER_SIZE = 10 * ZOOM;
 
   const PLAYER_CANVAS = CANVAS_WIDTH / 2 - PLAYER_SIZE / 2;
 
@@ -31,7 +31,8 @@ function e() {
 
   let speed = 0;
   let mphSpeed = 0; // MAX REAL SPEED = 220 mph / MAX GAME SPEED = 2 = 110 * speed
-  const speedFriction = 0.1 * ZOOM;
+  const speedFriction = 0.01 * ZOOM;
+  let steerSpeed;
   let steering = 180;
   let steerDirection = 0;
   const steerFriction = 0.1;
@@ -125,17 +126,17 @@ function e() {
   }
 
   function drawStats() {
-    ctx.fillText(`Speed: ${Math.round(speed * 100)}mph`, 10, 40);
+    ctx.fillText(`Speed: ${Math.round((speed * 30) / ZOOM)}mph`, 10, 40);
     ctx.fillText(`raw speed: ${speed}px/ps`, 10, 100);
   }
 
   function handleControls() {
     if (pressedW) speed = Math.min(MAX_SPEED, speed + MOVE_SPEED);
     if (pressedA)
-      steerDirection = Math.max(-MAX_STEER, steerDirection - STEER_SPEED);
+      steerDirection = Math.max(-MAX_STEER, steerDirection - steerSpeed);
     if (pressedS) speed = Math.max(-MAX_SPEED, speed - MOVE_SPEED / 1.5);
     if (pressedD)
-      steerDirection = Math.min(MAX_STEER, steerDirection + STEER_SPEED);
+      steerDirection = Math.min(MAX_STEER, steerDirection + steerSpeed);
 
     if (pressedSpace) speed = Math.max(0, speed - MOVE_SPEED);
 
@@ -183,8 +184,11 @@ function e() {
 
   function main() {
     // friction
+    // friction must be claculated before main loop. this way the max speed can be reached :ok:
     if (speed > 0) speed -= speedFriction;
     else if (speed < 0) speed += speedFriction;
+
+    steerSpeed = BASE_STEER_SPEED * Math.min(1, (speed + 1) / MAX_SPEED);
 
     handleCollisions();
     handleControls();
