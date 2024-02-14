@@ -137,8 +137,12 @@ function e() {
   }
 
   function drawStats() {
+    ctx.font = "bold 35pt Tahoma";
     ctx.fillText(`Speed: ${Math.round((speed * 30) / ZOOM)}mph`, 10, 40);
+    ctx.font = "bold 10pt Tahoma";
     ctx.fillText(`raw speed: ${speed}px/ps`, 10, 100);
+    ctx.fillText(`direction ${steering}deg`, 10, 120);
+    ctx.fillText(`steering ${steerDirection}deg`, 10, 140);
   }
 
   function handleControls() {
@@ -152,19 +156,6 @@ function e() {
       steerDirection = Math.min(MAX_STEER, steerDirection + steerSpeed);
 
     if (pressedSpace) speed = Math.max(0, speed - ACCEL_SPEED);
-
-    const convertedSteer = speed == 0 ? 0 : steerDirection * (speed / 100);
-    steering += convertedSteer;
-    //
-    speed -= speed > 0 ? abs(convertedSteer / 500) : -abs(convertedSteer / 500);
-    //
-    steerDirection =
-      steerDirection > 0
-        ? Math.max(0, steerDirection - abs(convertedSteer))
-        : Math.min(0, steerDirection + abs(convertedSteer));
-
-    if (steering > 360) steering -= 360;
-    if (steering < 0) steering += 360;
   }
 
   function handleCollisions() {
@@ -193,17 +184,46 @@ function e() {
     }
   }
 
-  let lastPositions = [];
-  ctx.font = "italic bold 35pt Tahoma";
-
-  function main() {
+  function physics() {
     // friction
-    // friction must be claculated before main loop. this way the max speed can be reached :ok:
+    // friction must be claculated before max speed cap. this way the max speed can be reached :ok: same with steering
     if (speed > 0) speed -= speedFriction;
     else if (speed < 0) speed += speedFriction;
 
-    steerSpeed = BASE_STEER_SPEED / abs(speed + 0.5);
+    // steering ----
+
+    const convertedSteer = speed == 0 ? 0 : steerDirection * (speed / 100);
+    steering += convertedSteer;
+    //
+    speed -= speed > 0 ? abs(convertedSteer / 500) : -abs(convertedSteer / 500);
+    //
+    steerDirection =
+      steerDirection > 0
+        ? Math.max(0, steerDirection - abs(convertedSteer))
+        : Math.min(0, steerDirection + abs(convertedSteer));
+
+    if (steering > 360) steering -= 360;
+    if (steering < 0) steering += 360;
+
+    steerSpeed = BASE_STEER_SPEED / abs(speed + 0.5 /*/ 2*/);
     console.log("steer: ", steerSpeed);
+
+    // rounding and stuff idk
+
+    speed = Math.round(speed * 1000) / 1000;
+    steerDirection = Math.round(steerDirection * 1000) / 1000;
+    steering = Math.round(steering * 1000) / 1000;
+
+    if (abs(speed) < 0.01 && abs(speed) > 0) speed = 0;
+    x += speed * Math.cos((steering * Math.PI) / 180);
+    y += speed * Math.sin((steering * Math.PI) / 180);
+    mphSpeed = Math.round(speed * 68.75);
+  }
+
+  let lastPositions = [];
+
+  function main() {
+    physics(); // must be run before controls because in controls, the max cap is calculated, this ensures the max caps can be reached
 
     handleCollisions();
     handleControls();
@@ -215,17 +235,6 @@ function e() {
     //   speedY += 1; // gravity
     // if (steerDirection > 0) steerDirection -= steerFriction;
     // else if (steerDirection < 0) steerDirection += steerFriction;
-
-    speed = Math.round(speed * 1000) / 1000;
-    steerDirection = Math.round(steerDirection * 1000) / 1000;
-    steering = Math.round(steering * 1000) / 1000;
-
-    if (abs(speed) < 0.01 && abs(speed) > 0) speed = 0;
-    x += speed * Math.cos((steering * Math.PI) / 180);
-    y += speed * Math.sin((steering * Math.PI) / 180);
-    //   x += speedX;
-    //   y += speedY;
-    mphSpeed = Math.round(speed * 68.75);
 
     ctx.drawImage(
       backgroundImage,
