@@ -19,9 +19,9 @@ function e() {
     "https://media.istockphoto.com/id/1333794966/vector/top-down-racing-circuit-isolated-on-white-background.jpg?s=612x612&w=0&k=20&c=fEvS411Mvc2TSmAc0zULCX1_yvZZXTV_1Zsz99_ND0A=";
 
   const MOVE_SPEED = 0.2 * ZOOM;
-  const MAX_SPEED = 10 * ZOOM;
-  const STEER_SPEED = 2;
-  const MAX_STEER = 12;
+  const MAX_SPEED = 12 * ZOOM;
+  const STEER_SPEED = 3;
+  const MAX_STEER = 20;
   const PLAYER_SIZE = 25 * ZOOM;
 
   const PLAYER_CANVAS = CANVAS_WIDTH / 2 - PLAYER_SIZE / 2;
@@ -30,6 +30,7 @@ function e() {
   let y = 2500 * ZOOM;
 
   let speed = 0;
+  let mphSpeed = 0; // MAX REAL SPEED = 220 mph / MAX GAME SPEED = 2 = 110 * speed
   const speedFriction = 0.1 * ZOOM;
   let steering = 180;
   let steerDirection = 0;
@@ -48,15 +49,19 @@ function e() {
     e => {
       switch (e.key) {
         case "w":
+        case "ArrowUp":
           pressedW = true;
           break;
         case "a":
+        case "ArrowLeft":
           pressedA = true;
           break;
         case "s":
+        case "ArrowDown":
           pressedS = true;
           break;
         case "d":
+        case "ArrowRight":
           pressedD = true;
           break;
         case " ": // space
@@ -72,15 +77,19 @@ function e() {
     e => {
       switch (e.key) {
         case "w":
+        case "ArrowUp":
           pressedW = false;
           break;
         case "a":
+        case "ArrowLeft":
           pressedA = false;
           break;
         case "s":
+        case "ArrowDown":
           pressedS = false;
           break;
         case "d":
+        case "ArrowRight":
           pressedD = false;
           break;
         case " ": // space
@@ -115,6 +124,11 @@ function e() {
     ctx.stroke();
   }
 
+  function drawStats() {
+    ctx.fillText(`Speed: ${Math.round(speed * 100)}mph`, 10, 40);
+    ctx.fillText(`raw speed: ${speed}px/ps`, 10, 100);
+  }
+
   function handleControls() {
     if (pressedW) speed = Math.min(MAX_SPEED, speed + MOVE_SPEED);
     if (pressedA)
@@ -126,8 +140,9 @@ function e() {
     if (pressedSpace) speed = Math.max(0, speed - MOVE_SPEED);
 
     const convertedSteer =
-      speed == 0 ? 0 : steerDirection * 0.2 * (speed / MAX_SPEED);
+      speed == 0 ? 0 : steerDirection * 0.1 * (speed / MAX_SPEED);
     steering += convertedSteer;
+    speed -= Math.abs(convertedSteer / 80);
     steerDirection =
       steerDirection > 0
         ? Math.max(0, steerDirection - Math.abs(convertedSteer))
@@ -164,17 +179,21 @@ function e() {
   }
 
   let lastPositions = [];
+  ctx.font = "italic bold 35pt Tahoma";
 
   function main() {
+    // friction
+    if (speed > 0) speed -= speedFriction;
+    else if (speed < 0) speed += speedFriction;
+
     handleCollisions();
     handleControls();
+
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     console.log(speed, steering, steerDirection, x, y);
 
     //   speedY += 1; // gravity
-    if (speed > 0) speed -= speedFriction;
-    else if (speed < 0) speed += speedFriction;
     // if (steerDirection > 0) steerDirection -= steerFriction;
     // else if (steerDirection < 0) steerDirection += steerFriction;
 
@@ -186,6 +205,7 @@ function e() {
     y += speed * Math.sin((steering * Math.PI) / 180);
     //   x += speedX;
     //   y += speedY;
+    mphSpeed = Math.round(speed * 68.75);
 
     ctx.drawImage(
       backgroundImage,
@@ -213,6 +233,7 @@ function e() {
     ctx.fillStyle = "black";
 
     drawArrow();
+    drawStats();
 
     requestAnimationFrame(main);
   }
