@@ -20,7 +20,7 @@ function e() {
 
   const MOVE_SPEED = 0.2 * ZOOM;
   const MAX_SPEED = 12 * ZOOM;
-  const STEER_SPEED = 3;
+  const STEER_SPEED = 2;
   const MAX_STEER = 20;
   const PLAYER_SIZE = 25 * ZOOM;
 
@@ -201,6 +201,7 @@ function e() {
     steerDirection = Math.round(steerDirection * 1000) / 1000;
     steering = Math.round(steering * 1000) / 1000;
 
+    if (Math.abs(speed) < 0.01 && Math.abs(speed) > 0) speed = 0;
     x += speed * Math.cos((steering * Math.PI) / 180);
     y += speed * Math.sin((steering * Math.PI) / 180);
     //   x += speedX;
