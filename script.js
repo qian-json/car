@@ -1,7 +1,18 @@
+const abs = Math.abs;
+
+const canvas = document.getElementById("canvas1");
+const ctx = canvas.getContext("2d");
+
+function rotate(x, y, angle, render) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  render();
+  ctx.restore();
+}
+
 function e() {
   // start game lol
-  const canvas = document.getElementById("canvas1");
-  const ctx = canvas.getContext("2d");
 
   const zoomRange = document.getElementById("zoomRange");
   let ZOOM = zoomRange.value / 10;
@@ -12,22 +23,22 @@ function e() {
 
   const CANVAS_WIDTH = (canvas.width = 600);
   const CANVAS_HEIGHT = (canvas.height = 600);
-  const BACKGROUND_WIDTH = 8430 * ZOOM;
-  const BACKGROUND_HEIGHT = 7350 * ZOOM;
+  const BACKGROUND_WIDTH = 16830 * ZOOM;
+  const BACKGROUND_HEIGHT = 14700 * ZOOM;
   const backgroundImage = new Image();
   backgroundImage.src =
     "https://media.istockphoto.com/id/1333794966/vector/top-down-racing-circuit-isolated-on-white-background.jpg?s=612x612&w=0&k=20&c=fEvS411Mvc2TSmAc0zULCX1_yvZZXTV_1Zsz99_ND0A=";
 
-  const MOVE_SPEED = 0.2 * ZOOM;
+  const ACCEL_SPEED = 0.1 * ZOOM;
   const MAX_SPEED = 12 * ZOOM;
-  const BASE_STEER_SPEED = 2;
-  const MAX_STEER = 32;
-  const PLAYER_SIZE = 10 * ZOOM;
+  const BASE_STEER_SPEED = 4;
+  const MAX_STEER = 48;
+  const PLAYER_SIZE = 40 * ZOOM;
 
   const PLAYER_CANVAS = CANVAS_WIDTH / 2 - PLAYER_SIZE / 2;
 
-  let x = 2925 * ZOOM;
-  let y = 2500 * ZOOM;
+  let x = 5850 * ZOOM;
+  let y = 5000 * ZOOM;
 
   let speed = 0;
   let mphSpeed = 0; // MAX REAL SPEED = 220 mph / MAX GAME SPEED = 2 = 110 * speed
@@ -37,10 +48,10 @@ function e() {
   let steerDirection = 0;
   const steerFriction = 0.1;
 
-  let pressedW = false;
-  let pressedA = false;
-  let pressedS = false;
-  let pressedD = false;
+  let pressedAccelerate = false;
+  let pressedLeftTurn = false;
+  let pressedReverse = false;
+  let pressedRightTurn = false;
   let pressedSpace = false;
 
   let touchingBorder = {left: false, right: false, top: false, bottom: false};
@@ -51,19 +62,19 @@ function e() {
       switch (e.key) {
         case "w":
         case "ArrowUp":
-          pressedW = true;
+          pressedAccelerate = true;
           break;
         case "a":
         case "ArrowLeft":
-          pressedA = true;
+          pressedLeftTurn = true;
           break;
         case "s":
         case "ArrowDown":
-          pressedS = true;
+          pressedReverse = true;
           break;
         case "d":
         case "ArrowRight":
-          pressedD = true;
+          pressedRightTurn = true;
           break;
         case " ": // space
           pressedSpace = true;
@@ -79,19 +90,19 @@ function e() {
       switch (e.key) {
         case "w":
         case "ArrowUp":
-          pressedW = false;
+          pressedAccelerate = false;
           break;
         case "a":
         case "ArrowLeft":
-          pressedA = false;
+          pressedLeftTurn = false;
           break;
         case "s":
         case "ArrowDown":
-          pressedS = false;
+          pressedReverse = false;
           break;
         case "d":
         case "ArrowRight":
-          pressedD = false;
+          pressedRightTurn = false;
           break;
         case " ": // space
           pressedSpace = false;
@@ -131,23 +142,26 @@ function e() {
   }
 
   function handleControls() {
-    if (pressedW) speed = Math.min(MAX_SPEED, speed + MOVE_SPEED);
-    if (pressedA)
+    if (pressedAccelerate) speed = Math.min(MAX_SPEED, speed + ACCEL_SPEED);
+    if (pressedLeftTurn)
       steerDirection = Math.max(-MAX_STEER, steerDirection - steerSpeed);
-    if (pressedS) speed = Math.max(-MAX_SPEED, speed - MOVE_SPEED / 1.5);
-    if (pressedD)
+    if (pressedReverse)
+      // speed = Math.max(-MAX_SPEED, speed - ACCEL_SPEED / 1.5);
+      speed = Math.max(-(MAX_SPEED / 2), speed - ACCEL_SPEED / 1.5);
+    if (pressedRightTurn)
       steerDirection = Math.min(MAX_STEER, steerDirection + steerSpeed);
 
-    if (pressedSpace) speed = Math.max(0, speed - MOVE_SPEED);
+    if (pressedSpace) speed = Math.max(0, speed - ACCEL_SPEED);
 
-    const convertedSteer =
-      speed == 0 ? 0 : steerDirection * 0.1 * (speed / MAX_SPEED);
+    const convertedSteer = speed == 0 ? 0 : steerDirection * (speed / 100);
     steering += convertedSteer;
-    speed -= Math.abs(convertedSteer / 80);
+    //
+    speed -= speed > 0 ? abs(convertedSteer / 500) : -abs(convertedSteer / 500);
+    //
     steerDirection =
       steerDirection > 0
-        ? Math.max(0, steerDirection - Math.abs(convertedSteer))
-        : Math.min(0, steerDirection + Math.abs(convertedSteer));
+        ? Math.max(0, steerDirection - abs(convertedSteer))
+        : Math.min(0, steerDirection + abs(convertedSteer));
 
     if (steering > 360) steering -= 360;
     if (steering < 0) steering += 360;
@@ -188,7 +202,8 @@ function e() {
     if (speed > 0) speed -= speedFriction;
     else if (speed < 0) speed += speedFriction;
 
-    steerSpeed = BASE_STEER_SPEED * Math.min(1, (speed + 1) / MAX_SPEED);
+    steerSpeed = BASE_STEER_SPEED / abs(speed + 0.5);
+    console.log("steer: ", steerSpeed);
 
     handleCollisions();
     handleControls();
@@ -205,7 +220,7 @@ function e() {
     steerDirection = Math.round(steerDirection * 1000) / 1000;
     steering = Math.round(steering * 1000) / 1000;
 
-    if (Math.abs(speed) < 0.01 && Math.abs(speed) > 0) speed = 0;
+    if (abs(speed) < 0.01 && abs(speed) > 0) speed = 0;
     x += speed * Math.cos((steering * Math.PI) / 180);
     y += speed * Math.sin((steering * Math.PI) / 180);
     //   x += speedX;
@@ -220,22 +235,26 @@ function e() {
       BACKGROUND_HEIGHT
     );
 
-    // Push the current position to the lastPositions array
-    lastPositions.push({x: PLAYER_CANVAS, y: PLAYER_CANVAS});
-    //   lastPositions.push({x: x, y: y});
+    rotate(
+      CANVAS_WIDTH / 2,
+      CANVAS_HEIGHT / 2,
+      (steering * Math.PI) / 180,
+      () => {
+        ctx.fillStyle = "red";
+        ctx.fillRect(
+          -PLAYER_SIZE / 2,
+          -PLAYER_SIZE / 2,
+          2 * PLAYER_SIZE,
+          PLAYER_SIZE
+        );
+      }
+    );
 
-    // If there are more than 3 positions in the array, remove the oldest one
-    if (lastPositions.length > 20) {
-      lastPositions.shift();
-    }
-
-    // Draw a rectangle at each of the positions in the lastPositions array
-    lastPositions.forEach((pos, index) => {
-      let colorValue = Math.floor(255 - (index / 20) * 255);
-      ctx.fillStyle = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
-      ctx.fillRect(pos.x, pos.y, PLAYER_SIZE, PLAYER_SIZE);
-    });
-    ctx.fillStyle = "black";
+    // ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    // ctx.rotate(Math.cos((steering * Math.PI) / 180));
+    // ctx.fillStyle = "black";
+    // ctx.fillRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, PLAYER_SIZE, PLAYER_SIZE);
+    // ctx.rotate(0);
 
     drawArrow();
     drawStats();
