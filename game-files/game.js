@@ -14,6 +14,7 @@ function rotate(x, y, angle, render) {
 function e() {
   // start game lol
 
+  // constants
   const zoomRange = document.getElementById("zoomRange");
   let ZOOM = zoomRange.value / 10;
   // zoomRange.addEventListener("change", () => {
@@ -48,13 +49,16 @@ function e() {
   let steerDirection = 0;
   const steerFriction = 0.1;
 
-  let pressedAccelerate = false;
-  let pressedLeftTurn = false;
-  let pressedReverse = false;
-  let pressedRightTurn = false;
-  let pressedSpace = false;
-
   let touchingBorder = {left: false, right: false, top: false, bottom: false};
+
+  // controls
+  const pressed = {
+    accelerate: false,
+    leftTurn: false,
+    reverse: false,
+    rightTurn: false,
+    space: false,
+  };
 
   window.addEventListener(
     "keydown",
@@ -62,22 +66,22 @@ function e() {
       switch (e.key) {
         case "w":
         case "ArrowUp":
-          pressedAccelerate = true;
+          pressed.accelerate = true;
           break;
         case "a":
         case "ArrowLeft":
-          pressedLeftTurn = true;
+          pressed.leftTurn = true;
           break;
         case "s":
         case "ArrowDown":
-          pressedReverse = true;
+          pressed.reverse = true;
           break;
         case "d":
         case "ArrowRight":
-          pressedRightTurn = true;
+          pressed.rightTurn = true;
           break;
         case " ": // space
-          pressedSpace = true;
+          pressed.space = true;
           break;
       }
     },
@@ -90,28 +94,29 @@ function e() {
       switch (e.key) {
         case "w":
         case "ArrowUp":
-          pressedAccelerate = false;
+          pressed.accelerate = false;
           break;
         case "a":
         case "ArrowLeft":
-          pressedLeftTurn = false;
+          pressed.leftTurn = false;
           break;
         case "s":
         case "ArrowDown":
-          pressedReverse = false;
+          pressed.reverse = false;
           break;
         case "d":
         case "ArrowRight":
-          pressedRightTurn = false;
+          pressed.rightTurn = false;
           break;
         case " ": // space
-          pressedSpace = false;
+          pressed.space = false;
           break;
       }
     },
     false
   );
 
+  // drawing functions
   function drawArrow() {
     ctx.beginPath();
     ctx.strokeStyle = "blue";
@@ -145,17 +150,17 @@ function e() {
     ctx.fillText(`steering ${steerDirection}deg`, 10, 140);
   }
 
+  // main helper functions
   function handleControls() {
-    if (pressedAccelerate) speed = Math.min(MAX_SPEED, speed + ACCEL_SPEED);
-    if (pressedLeftTurn)
+    if (pressed.accelerate) speed = Math.min(MAX_SPEED, speed + ACCEL_SPEED);
+    if (pressed.leftTurn)
       steerDirection = Math.max(-MAX_STEER, steerDirection - steerSpeed);
-    if (pressedReverse)
-      // speed = Math.max(-MAX_SPEED, speed - ACCEL_SPEED / 1.5);
+    if (pressed.reverse)
       speed = Math.max(-(MAX_SPEED / 2), speed - ACCEL_SPEED / 1.5);
-    if (pressedRightTurn)
+    if (pressed.rightTurn)
       steerDirection = Math.min(MAX_STEER, steerDirection + steerSpeed);
 
-    if (pressedSpace) speed = Math.max(0, speed - ACCEL_SPEED);
+    if (pressed.space) speed = Math.max(0, speed - ACCEL_SPEED);
   }
 
   function handleCollisions() {
@@ -220,8 +225,7 @@ function e() {
     mphSpeed = Math.round(speed * 68.75);
   }
 
-  let lastPositions = [];
-
+  // main loop
   function main() {
     physics(); // must be run before controls because in controls, the max cap is calculated, this ensures the max caps can be reached
 
@@ -231,10 +235,6 @@ function e() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     console.log(speed, steering, steerDirection, x, y);
-
-    //   speedY += 1; // gravity
-    // if (steerDirection > 0) steerDirection -= steerFriction;
-    // else if (steerDirection < 0) steerDirection += steerFriction;
 
     ctx.drawImage(
       backgroundImage,
@@ -258,12 +258,6 @@ function e() {
         );
       }
     );
-
-    // ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-    // ctx.rotate(Math.cos((steering * Math.PI) / 180));
-    // ctx.fillStyle = "black";
-    // ctx.fillRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, PLAYER_SIZE, PLAYER_SIZE);
-    // ctx.rotate(0);
 
     drawArrow();
     drawStats();
