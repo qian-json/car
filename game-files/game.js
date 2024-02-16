@@ -53,7 +53,7 @@ function e() {
 
   const ACCEL_SPEED = 0.1;
   const MAX_SPEED = 12;
-  const BASE_STEER_SPEED = 4;
+  const BASE_STEER_SPEED = 3;
   const MAX_STEER = 40;
   const PLAYER_SIZE = 40;
 
@@ -218,7 +218,7 @@ function e() {
 
     // steering ----
 
-    const convertedSteer = speed == 0 ? 0 : steerDirection * (speed / 250);
+    const convertedSteer = speed == 0 ? 0 : steerDirection * (speed / 200);
     steering += convertedSteer;
     //
     speed -= speed > 0 ? abs(convertedSteer / 500) : -abs(convertedSteer / 500);
