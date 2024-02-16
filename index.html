@@ -16,13 +16,6 @@
           <ul>
             <li>WASD/Arrow Keys - duh</li>
             <li>Space - handbrake duh</li>
-
-            <li>
-              select a zoom and press start. since i am too lazy to do some code
-              optimizations you have to refresh the page and set a new zoom if
-              you want to change the zoom setting. i recommend trying zoom level
-              2-5
-            </li>
           </ul>
         </div>
         <div>
@@ -32,8 +25,8 @@
               v0.1.9 - camera zooms out when accelerating + zoom code reworks
             </li>
             <li>
-              v0.1.8 (released with v0.1.9) - significant code reworks, wheels, even
-              more steering changes i dont know how to drive idk
+              v0.1.8 (released with v0.1.9) - significant code reworks, wheels,
+              even more steering changes i dont know how to drive idk
             </li>
             <li>
               v0.1.7 - SUPER REALISTIC STEERING i dont even know how much more
@@ -55,14 +48,14 @@
             <li>email stockriderj@gmail.com for suggestions</li>
           </ul>
         </div>
-
-        <label for="zoomRange">zoom</label>
-        <input type="range" min="1" max="10" value="2" id="zoomRange" />
-        <button onclick="e(); this.disabled=true;">start</button>
       </aside>
 
       <div>
         <canvas id="canvas1"></canvas>
+        
+        <label for="zoomRange">zoom</label>
+        <input type="range" min="20" max="100" value="50" id="zoomRange" />
+        <button onclick="e(); this.disabled=true;">start</button>
       </div>
     </main>
 

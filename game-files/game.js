@@ -16,10 +16,10 @@ function e() {
 
   // constants
   const zoomRange = document.getElementById("zoomRange");
-  let BASE_ZOOM = zoomRange.value / 10;
+  let BASE_ZOOM = zoomRange.value / 100;
   let ZOOM = BASE_ZOOM;
-  zoomRange.addEventListener("change", () => {
-    BASE_ZOOM = zoomRange.value / 10;
+  zoomRange.addEventListener("input", () => {
+    BASE_ZOOM = zoomRange.value / 100;
   });
 
   // const BASE_ZOOM = {
