@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    mode: 'development',  // Add this line
+    mode: 'development',
     entry: './src/game.ts',
     module: {
         rules: [
@@ -23,7 +23,7 @@ module.exports = {
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'  // Add this line
+        publicPath: '/'
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -38,6 +38,6 @@ module.exports = {
     devServer: {
         static: './dist',
         hot: true,
-        historyApiFallback: true  // Add this line
+        historyApiFallback: true
     }
 };
