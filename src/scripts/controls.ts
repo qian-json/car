@@ -1,81 +1,101 @@
 export interface PressedKeys {
     accelerate: boolean;
     leftTurn: boolean;
-    reverse: boolean;
+    brake: boolean;  // Changed from reverse
     rightTurn: boolean;
     space: boolean;
 }
 
 export class Controls {
-    pressed: PressedKeys;
+    public pressed: {
+        accelerate: boolean;
+        brake: boolean;
+        leftTurn: boolean;
+        rightTurn: boolean;
+        space: boolean;
+        gearUp: boolean;
+        gearDown: boolean;
+    };
+    private gearUpPressed: boolean = false;
+    private gearDownPressed: boolean = false;
 
     constructor() {
         this.pressed = {
             accelerate: false,
+            brake: false,
             leftTurn: false,
-            reverse: false,
             rightTurn: false,
             space: false,
+            gearUp: false,
+            gearDown: false
         };
 
-        this.setupEventListeners();
-    }
+        document.addEventListener('keydown', ({ key }) => {
+            switch (key.toLowerCase()) {
+                case "w":
+                case "ArrowUp":
+                    this.pressed.accelerate = true;
+                    break;
+                case "a":
+                case "ArrowLeft":
+                    this.pressed.leftTurn = true;
+                    break;
+                case "s":
+                case "ArrowDown":
+                    this.pressed.brake = true;
+                    break;
+                case "d":
+                case "ArrowRight":
+                    this.pressed.rightTurn = true;
+                    break;
+                case " ": // space
+                    this.pressed.space = true;
+                    break;
+                case 'x':
+                    if (!this.gearUpPressed) {
+                        this.pressed.gearUp = true;
+                        this.gearUpPressed = true;
+                    }
+                    break;
+                case 'z':
+                    if (!this.gearDownPressed) {
+                        this.pressed.gearDown = true;
+                        this.gearDownPressed = true;
+                    }
+                    break;
+            }
+        });
 
-    private setupEventListeners(): void {
-        window.addEventListener(
-            "keydown",
-            (e: KeyboardEvent) => {
-                switch (e.key) {
-                    case "w":
-                    case "ArrowUp":
-                        this.pressed.accelerate = true;
-                        break;
-                    case "a":
-                    case "ArrowLeft":
-                        this.pressed.leftTurn = true;
-                        break;
-                    case "s":
-                    case "ArrowDown":
-                        this.pressed.reverse = true;
-                        break;
-                    case "d":
-                    case "ArrowRight":
-                        this.pressed.rightTurn = true;
-                        break;
-                    case " ": // space
-                        this.pressed.space = true;
-                        break;
-                }
-            },
-            false
-        );
-
-        window.addEventListener(
-            "keyup",
-            (e: KeyboardEvent) => {
-                switch (e.key) {
-                    case "w":
-                    case "ArrowUp":
-                        this.pressed.accelerate = false;
-                        break;
-                    case "a":
-                    case "ArrowLeft":
-                        this.pressed.leftTurn = false;
-                        break;
-                    case "s":
-                    case "ArrowDown":
-                        this.pressed.reverse = false;
-                        break;
-                    case "d":
-                    case "ArrowRight":
-                        this.pressed.rightTurn = false;
-                        break;
-                    case " ": // space
-                        this.pressed.space = false;
-                        break;
-                }
-            },
-            false
-        );
+        document.addEventListener('keyup', ({ key }) => {
+            switch (key.toLowerCase()) {
+                case "w":
+                case "ArrowUp":
+                    this.pressed.accelerate = false;
+                    break;
+                case "a":
+                case "ArrowLeft":
+                    this.pressed.leftTurn = false;
+                    break;
+                case "s":
+                case "ArrowDown":
+                    this.pressed.brake = false;
+                    break;
+                case "d":
+                case "ArrowRight":
+                    this.pressed.rightTurn = false;
+                    break;
+                case " ": // space
+                    this.pressed.space = false;
+                    break;
+                case 'x':
+                    this.pressed.gearUp = false;
+                    this.gearUpPressed = false;
+                    break;
+                case 'z':
+                    this.pressed.gearDown = false;
+                    this.gearDownPressed = false;
+                    break;
+            }
+        });
     }
 }

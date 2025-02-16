@@ -22,6 +22,7 @@ class Game {
     private steerSpeed: number = 0;
     private steering: number = 180;
     private steerDirection: number = 0;
+    private currentGear: keyof typeof CONST.GEARS = 'N';
     private touchingBorder: TouchingBorder = {
         left: false,
         right: false,
@@ -57,7 +58,8 @@ class Game {
             steering: this.steering,
             steerDirection: this.steerDirection,
             zoom: this.zoom,
-            baseZoom: this.baseZoom
+            baseZoom: this.baseZoom,
+            currentGear: this.currentGear
         };
         this.physics = new Physics(initialState);
     }
@@ -83,20 +85,37 @@ class Game {
     }
 
     private handleControls(): void {
-        if (this.controls.pressed.accelerate) 
-            this.speed = Math.min(CONST.MAX_SPEED, this.speed + CONST.ACCEL_SPEED);
+        // Only handle steering in game class
         if (this.controls.pressed.leftTurn)
             this.steerDirection = Math.max(-CONST.MAX_STEER, this.steerDirection - this.steerSpeed);
-        if (this.controls.pressed.reverse)
-            this.speed = Math.max(-(CONST.MAX_SPEED / 2), this.speed - CONST.ACCEL_SPEED / 1.5);
         if (this.controls.pressed.rightTurn)
             this.steerDirection = Math.min(CONST.MAX_STEER, this.steerDirection + this.steerSpeed);
-        if (this.controls.pressed.space) 
-            this.speed = Math.max(0, this.speed - CONST.ACCEL_SPEED);
 
+        // Handle gear changes
+        type GearType = keyof typeof CONST.GEARS;
+        const gearOrder: GearType[] = ['R', 'N', '1', '2', '3', '4'];
+
+        if (this.controls.pressed.gearUp) {
+            const currentIndex = gearOrder.indexOf(this.currentGear);
+            if (currentIndex < gearOrder.length - 1) {
+                this.currentGear = gearOrder[currentIndex + 1];
+            }
+            this.controls.pressed.gearUp = false;
+        }
+        if (this.controls.pressed.gearDown) {
+            const currentIndex = gearOrder.indexOf(this.currentGear);
+            if (currentIndex > 0) {
+                this.currentGear = gearOrder[currentIndex - 1];
+            }
+            this.controls.pressed.gearDown = false;
+        }
+
+        // Pass control states to physics
         this.physics.updateControls({
-            speed: this.speed,
-            steerDirection: this.steerDirection
+            accelerate: this.controls.pressed.accelerate,
+            brake: this.controls.pressed.brake,
+            steerDirection: this.steerDirection,
+            gear: this.currentGear
         });
     }
 
@@ -124,6 +143,7 @@ class Game {
         this.steerDirection = newState.steerDirection;
         this.zoom = newState.zoom;
         this.baseZoom = newState.baseZoom;
+        this.currentGear = newState.currentGear;
     }
 
     private render(): void {
@@ -134,7 +154,8 @@ class Game {
             steering: this.steering,
             steerDirection: this.steerDirection,
             speed: this.speed,
-            backgroundImage: this.backgroundImage
+            backgroundImage: this.backgroundImage,
+            currentGear: this.currentGear
         });
     }
 

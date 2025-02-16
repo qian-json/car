@@ -20,17 +20,16 @@ export const STEER_FRICTION = 0.1;
 
 // Gear type definition
 interface GearConfig {
+    ratio: number;
     maxSpeed: number;
-    accelMultiplier: number;
-    brakingForce: number;
 }
 
 // Gears
 export const GEARS: Record<string, GearConfig> = {
-    R: { maxSpeed: 6, accelMultiplier: 0.7, brakingForce: 0.02 },
-    N: { maxSpeed: 12, accelMultiplier: 0, brakingForce: 0.005 },
-    1: { maxSpeed: 4, accelMultiplier: 1.2, brakingForce: 0.03 },
-    2: { maxSpeed: 6, accelMultiplier: 1.0, brakingForce: 0.025 },
-    3: { maxSpeed: 9, accelMultiplier: 0.8, brakingForce: 0.02 },
-    4: { maxSpeed: 12, accelMultiplier: 0.6, brakingForce: 0.015 }
+    R: { ratio: -0.5, maxSpeed: 4 },
+    N: { ratio: 0, maxSpeed: 0 },
+    1: { ratio: 1, maxSpeed: 4 },
+    2: { ratio: 0.7, maxSpeed: 6 },
+    3: { ratio: 0.4, maxSpeed: 9 },
+    4: { ratio: 0.2, maxSpeed: 12 }
 };

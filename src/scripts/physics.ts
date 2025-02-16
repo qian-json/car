@@ -12,18 +12,37 @@ export interface GameState {
     steerDirection: number;
     zoom: number;
     baseZoom: number;
+    currentGear: keyof typeof CONST.GEARS;  // Add this line
 }
 
 export class Physics {
     private state: GameState;
 
     constructor(initialState: GameState) {
-        this.state = initialState;
+        this.state = {
+            ...initialState,
+            currentGear: 'N'
+        };
     }
 
     update(): GameState {
-        if (this.state.speed > 0) this.state.speed -= CONST.SPEED_FRICTION;
-        else if (this.state.speed < 0) this.state.speed += CONST.SPEED_FRICTION;
+        const currentGearConfig = CONST.GEARS[this.state.currentGear];
+
+        // Apply gear-based friction
+        if (this.state.speed > 0) {
+            this.state.speed -= CONST.SPEED_FRICTION;
+        } else if (this.state.speed < 0) {
+            this.state.speed += CONST.SPEED_FRICTION;
+        }
+
+        // Limit speed based on current gear
+        if (this.state.currentGear !== 'N') {
+            const maxSpeed = currentGearConfig.maxSpeed * (this.state.speed > 0 ? 1 : -1);
+            this.state.speed = Math.min(
+                Math.abs(this.state.speed),
+                Math.abs(maxSpeed)
+            ) * Math.sign(this.state.speed);
+        }
 
         const convertedSteer = this.state.speed === 0 ? 0 : this.state.steerDirection * (this.state.speed / 200);
         this.state.steering += convertedSteer;
@@ -55,8 +74,32 @@ export class Physics {
         this.state.baseZoom = baseZoom;
     }
 
-    public updateControls(controls: { speed: number, steerDirection: number }): void {
-        this.state.speed = controls.speed;
+    public updateControls(controls: { 
+        accelerate: boolean,
+        brake: boolean,
+        steerDirection: number, 
+        gear?: keyof typeof CONST.GEARS
+    }): void {
+        if (controls.gear) {
+            this.state.currentGear = controls.gear;
+        }
+
+        const currentGearConfig = CONST.GEARS[this.state.currentGear];
+
+        // Handle braking
+        if (controls.brake) {
+            const brakeForce = CONST.ACCEL_SPEED * 1.5;
+            this.state.speed = this.state.speed > 0 
+                ? Math.max(0, this.state.speed - brakeForce)
+                : Math.min(0, this.state.speed + brakeForce);
+        }
+        
+        // Handle acceleration
+        if (controls.accelerate && this.state.currentGear !== 'N') {
+            const acceleration = CONST.ACCEL_SPEED * (currentGearConfig.ratio);
+            this.state.speed += acceleration;
+        }
+
         this.state.steerDirection = controls.steerDirection;
     }
 }

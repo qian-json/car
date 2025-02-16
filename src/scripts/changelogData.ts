@@ -1,5 +1,9 @@
 export const changelogData = [
     {
+        version: "0.1.5-beta",
+        changes: "basic manual transmission, known bugs: handbrake does not work"
+    },
+    {
         version: "0.1.4",
         changes: "refactor: modularize game.ts and fix wheel rendering (centered rotation)"
     },
