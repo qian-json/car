@@ -14,7 +14,7 @@ export const PLAYER_SIZE = 40;
 export const ACCEL_SPEED = 0.1;
 export const MAX_SPEED = 12;
 export const BASE_STEER_SPEED = 3;
-export const MAX_STEER = 40;
+export const MAX_STEER = 30;
 export const SPEED_FRICTION = 0.01;
 export const STEER_FRICTION = 0.1;
 
