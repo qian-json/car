@@ -3,7 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    entry: './src/scripts/main.ts',
+    entry: {
+        main: './src/scripts/main.ts',
+        changelog: './src/scripts/changelog.ts'
+    },
     module: {
         rules: [
             {
@@ -21,18 +24,20 @@ module.exports = {
         extensions: ['.ts', '.js']
     },
     output: {
-        filename: 'bundle.js',
+        filename: '[name].bundle.js',  // Use dynamic naming for multiple entry points
         path: path.resolve(__dirname, 'dist'),
         publicPath: '/'
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
-            filename: 'index.html'
+            filename: 'index.html',
+            chunks: ['main']
         }),
         new HtmlWebpackPlugin({
             template: './src/changelog.html',
-            filename: 'changelog.html'
+            filename: 'changelog.html',
+            chunks: ['changelog']
         })
     ],
     devServer: {
