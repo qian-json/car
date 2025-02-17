@@ -1,6 +1,6 @@
-import '../style.css';
-import { initGame } from './game';
-import { changelogData } from './changelogData';
+import './style.css';
+import { initGame } from './game/game';
+import { changelogData } from './changelog/changelogData';
 
 function updateVersions() {
     // Update latest updates list

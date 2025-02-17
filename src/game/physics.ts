@@ -1,4 +1,4 @@
-import * as CONST from './constants';
+import * as CONST from '../constants/gameConstants';
 
 const abs = Math.abs;
 

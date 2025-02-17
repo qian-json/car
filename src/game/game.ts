@@ -1,5 +1,4 @@
-import * as CONST from './constants';
-import '../style.css';
+import * as CONST from '../constants/gameConstants';
 import { Controls } from './controls';
 import { Renderer } from './renderer';
 import { Physics } from './physics';

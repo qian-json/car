@@ -4,8 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'development',
     entry: {
-        main: './src/scripts/main.ts',
-        changelog: './src/scripts/changelog.ts'
+        main: './src/main.ts',
+        changelog: './src/changelog/changelog.ts'
     },
     module: {
         rules: [
@@ -24,7 +24,7 @@ module.exports = {
         extensions: ['.ts', '.js']
     },
     output: {
-        filename: '[name].bundle.js',  // Use dynamic naming for multiple entry points
+        filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: '/'
     },
@@ -35,7 +35,7 @@ module.exports = {
             chunks: ['main']
         }),
         new HtmlWebpackPlugin({
-            template: './src/changelog.html',
+            template: './src/changelog/changelog.html',
             filename: 'changelog.html',
             chunks: ['changelog']
         })

@@ -1,4 +1,4 @@
-import * as CONST from './constants';
+import * as CONST from '../constants/gameConstants';
 
 export class Renderer {
     private ctx: CanvasRenderingContext2D;
