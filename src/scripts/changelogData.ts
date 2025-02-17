@@ -1,6 +1,10 @@
 export const changelogData = [
     {
-        version: "0.1.5-beta",
+        version: "0.2.1",
+        changes: "raised max speed, variable brake pressure; tuned gear ratios, removed handbrake"
+    },
+    {
+        version: "0.2-beta",
         changes: "basic manual transmission, known bugs: handbrake does not work"
     },
     {

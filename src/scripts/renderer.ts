@@ -65,20 +65,20 @@ export class Renderer {
         );
     }
 
-    drawArrow(steering: number, steerDirection: number): void {
+    private drawArrow(gameState: CONST.GameState): void {
         this.ctx.beginPath();
         this.ctx.strokeStyle = "blue";
         this.ctx.moveTo(this.CENTER_X, this.CENTER_Y);
         this.ctx.lineTo(
-            this.CENTER_X + 50 * Math.cos((steering * Math.PI) / 180),
-            this.CENTER_Y + 50 * Math.sin((steering * Math.PI) / 180)
+            this.CENTER_X + 50 * Math.cos((gameState.steering * Math.PI) / 180),
+            this.CENTER_Y + 50 * Math.sin((gameState.steering * Math.PI) / 180)
         );
         this.ctx.stroke();
 
         this.ctx.beginPath();
         this.ctx.strokeStyle = "black";
         this.ctx.moveTo(this.CENTER_X, this.CENTER_Y);
-        const blackSteering = steering + steerDirection;
+        const blackSteering = gameState.steering + gameState.steerDirection;
         this.ctx.lineTo(
             this.CENTER_X + 20 * Math.cos((blackSteering * Math.PI) / 180),
             this.CENTER_Y + 20 * Math.sin((blackSteering * Math.PI) / 180)
@@ -86,31 +86,42 @@ export class Renderer {
         this.ctx.stroke();
     }
 
-    drawStats(speed: number, steering: number, steerDirection: number, currentGear: keyof typeof CONST.GEARS): void {
+    private drawStats(gameState: CONST.GameState): void {
         this.ctx.font = "bold 35pt Tahoma";
-        this.ctx.fillText(`Speed: ${Math.round(speed * 30)}mph`, 10, 40);
+        this.ctx.fillText(`Speed: ${Math.round(gameState.speed * 6)}mph`, 10, 40);
         this.ctx.font = "bold 10pt Tahoma";
-        this.ctx.fillText(`raw speed: ${speed}px/ps`, 10, 100);
-        this.ctx.fillText(`direction ${steering}deg`, 10, 120);
-        this.ctx.fillText(`steering ${steerDirection}deg`, 10, 140);
+        this.ctx.fillText(`raw speed: ${gameState.speed}px/ps`, 10, 100);
+        this.ctx.fillText(`direction ${gameState.steering}deg`, 10, 120);
+        this.ctx.fillText(`steering ${gameState.steerDirection}deg`, 10, 140);
+
+        // Draw gear display
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(500, 10, 50, 30);
         this.ctx.fillStyle = 'black';
         this.ctx.font = '20px Arial';
-        this.ctx.fillText(`${currentGear}`, 519, 30);
+        this.ctx.fillText(`${gameState.currentGear}`, 519, 30);
+
+        // Draw brake pressure bar
+        const barWidth = 100;
+        const barHeight = 10;
+        const barX = 475;
+        const barY = 50;
+        
+        // Draw background bar
+        this.ctx.fillStyle = '#ddd';
+        this.ctx.fillRect(barX, barY, barWidth, barHeight);
+        
+        // Draw brake pressure fill
+        this.ctx.fillStyle = 'red';
+        const fillWidth = (gameState.brakePressure / CONST.MAX_BRAKE_PRESSURE) * barWidth;
+        this.ctx.fillRect(barX, barY, fillWidth, barHeight);
+
+        // Reset text color to black for subsequent text rendering
+        this.ctx.fillStyle = 'black';
     }
 
-    render(gameState: {
-        x: number,
-        y: number,
-        zoom: number,
-        steering: number,
-        steerDirection: number,
-        speed: number,
-        backgroundImage: HTMLImageElement,
-        currentGear: keyof typeof CONST.GEARS
-    }): void {
-        const { x, y, zoom, steering, steerDirection, speed, backgroundImage, currentGear } = gameState;
+    render(gameState: CONST.GameState): void {
+        const { x, y, zoom, steering, steerDirection, backgroundImage } = gameState;
 
         this.ctx.clearRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
         this.ctx.save();
@@ -118,19 +129,21 @@ export class Renderer {
         this.ctx.scale(zoom, zoom);
         this.ctx.translate(-this.CENTER_X, -this.CENTER_Y);
 
-        this.ctx.drawImage(
-            backgroundImage,
-            -x + this.PLAYER_CANVAS,
-            -y + this.PLAYER_CANVAS,
-            CONST.BACKGROUND_WIDTH,
-            CONST.BACKGROUND_HEIGHT
-        );
+        if (backgroundImage) {
+            this.ctx.drawImage(
+                backgroundImage,
+                -x + this.PLAYER_CANVAS,
+                -y + this.PLAYER_CANVAS,
+                CONST.BACKGROUND_WIDTH,
+                CONST.BACKGROUND_HEIGHT
+            );
+        }
 
         this.rotate(this.CENTER_X, this.CENTER_Y, (steering * Math.PI) / 180, 
             () => this.drawCar(steerDirection));
 
         this.ctx.restore();
-        this.drawArrow(steering, steerDirection);
-        this.drawStats(speed, steering, steerDirection, currentGear);
+        this.drawArrow(gameState);
+        this.drawStats(gameState);
     }
 }

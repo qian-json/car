@@ -98,4 +98,9 @@ export class Controls {
             }
         });
     }
+
+    public resetGearControls(): void {
+        this.pressed.gearUp = false;
+        this.pressed.gearDown = false;
+    }
 }
