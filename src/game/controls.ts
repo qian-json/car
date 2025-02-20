@@ -32,7 +32,7 @@ export class Controls {
 
         document.addEventListener('keydown', ({ key }) => {
             switch (key.toLowerCase()) {
-                case "w":
+                case "d":
                 case "ArrowUp":
                     this.pressed.accelerate = true;
                     break;
@@ -44,14 +44,14 @@ export class Controls {
                 case "ArrowDown":
                     this.pressed.brake = true;
                     break;
-                case "d":
+                case "f":
                 case "ArrowRight":
                     this.pressed.rightTurn = true;
                     break;
                 case " ": // space
                     this.pressed.space = true;
                     break;
-                case 'x':
+                case 'v':
                     if (!this.gearUpPressed) {
                         this.pressed.gearUp = true;
                         this.gearUpPressed = true;
@@ -68,7 +68,7 @@ export class Controls {
 
         document.addEventListener('keyup', ({ key }) => {
             switch (key.toLowerCase()) {
-                case "w":
+                case "d":
                 case "ArrowUp":
                     this.pressed.accelerate = false;
                     break;
@@ -80,14 +80,14 @@ export class Controls {
                 case "ArrowDown":
                     this.pressed.brake = false;
                     break;
-                case "d":
+                case "f":
                 case "ArrowRight":
                     this.pressed.rightTurn = false;
                     break;
                 case " ": // space
                     this.pressed.space = false;
                     break;
-                case 'x':
+                case 'v':
                     this.pressed.gearUp = false;
                     this.gearUpPressed = false;
                     break;

@@ -1,5 +1,9 @@
 export const changelogData = [
     {
+        version: "0.3-alpha",
+        changes: "alpha version - realistic transmission (rpm simulation, tachometer); changed controls and gear ratios; todo: clutch, better physics"
+    },
+    {
         version: "0.2.1",
         changes: "raised max speed, variable brake pressure; tuned gear ratios, removed handbrake"
     },

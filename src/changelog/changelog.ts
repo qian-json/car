@@ -6,6 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!changelogList) return;
 
     changelogList.innerHTML = changelogData
-        .map(entry => `<li>v${entry.version} - ${entry.changes}</li>`)
+        .map(entry => `<li>v${entry.version}: ${entry.changes}</li>`)
         .join('');
 });

@@ -8,7 +8,7 @@ function updateVersions() {
     if (changesList) {
         const latestThree = changelogData.slice(0, 3);
         const changesHTML = latestThree
-            .map(entry => `<li>v${entry.version} - ${entry.changes}</li>`)
+            .map(entry => `<li>v${entry.version}: ${entry.changes}</li>`)
             .join('');
 
         changesList.innerHTML = changesHTML + `

@@ -15,15 +15,23 @@ export const ACCEL_SPEED = 0.1;
 export const MAX_SPEED = 24;
 export const BASE_STEER_SPEED = 3;
 export const MAX_STEER = 30;
-export const SPEED_FRICTION = 0.003;
+export const SPEED_FRICTION = 0.006;
 export const STEER_FRICTION = 0.1;
+export const BRAKE_PRESSURE = 0.05;
 export const BRAKE_RATE = 8;
-export const MAX_BRAKE_PRESSURE = 100; // Maximum brake pressure
+
+// Engine RPM
+export const IDLE_RPM = 800;
+export const MAX_RPM = 6500;
+export const REDLINE_RPM = 7000;
+export const RPM_STEP = 50; // RPM change per frame when accelerating
+export const RPM_DECAY = 20; // RPM decrease per frame when not accelerating
+export const FRICTION = 0.1;          // Friction multiplier, controls how much friction affects the engine
+export const ENGINE_TORQUE = 500;     // Torque being applied by the engine (constant for simplicity)
 
 // Gear type definition
 interface GearConfig {
     ratio: number;
-    maxSpeed: number;
 }
 
 // Game State Interface
@@ -39,15 +47,18 @@ export interface GameState {
     baseZoom: number;
     currentGear: keyof typeof GEARS;
     brakePressure: number;
+    rpm: number;
     backgroundImage?: HTMLImageElement;
 }
 
 // Gears
 export const GEARS: Record<string, GearConfig> = {
-    R: { ratio: -0.5, maxSpeed: -0.3 },
-    N: { ratio: 0, maxSpeed: 0 },
-    1: { ratio: 1, maxSpeed: 0.3 },
-    2: { ratio: 0.7, maxSpeed: 0.5 },
-    3: { ratio: 0.4, maxSpeed: 0.7 },
-    4: { ratio: 0.2, maxSpeed: 1 }
+    R: { ratio: 1 },
+    N: { ratio: 0 },
+    1: { ratio: 2.8 },
+    2: { ratio: 1.8 },
+    3: { ratio: 1.4 },
+    4: { ratio: 1.1 },
+    5: { ratio: 0.85 },
+    6: { ratio: 0.6 }
 };
